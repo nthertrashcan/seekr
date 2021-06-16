@@ -49,10 +49,10 @@ async def resp(websocket,path):
                     message=message.split("--0")[1]
                     value,file,path=utils.scatter_existence(message)
                     if value:
-                        sctr.retrenc(file,path,"gka")
+
+                        sctr.retrenc(file,path,"gk")
                         fname=file.split("/")[len(file.split("/"))-1].strip()
                         ret=os.path.join(os.path.dirname(os.path.realpath(__file__)),f"{fname}")
-                        print(fname,ret)
 
                     if "--r" in message:
                         message=message.split("--r")[1].strip()
@@ -106,7 +106,7 @@ async def resp(websocket,path):
                         pflag,file,path=await utils.existconf(websocket,fname)
                         if pflag!=0:
                             if file is not None:
-                                sctr.cleanenc(file,path,"gka")
+                                sctr.cleanenc(file,path,"gk")
                             await utils.receive(websocket,fname,pflag,file,path)
                         else:
                             await websocket.send(f"--upnbytes{-2}")

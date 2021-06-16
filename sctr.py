@@ -117,10 +117,6 @@ def scattenc(name,path,kv):
 				f=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache"),"ab")
 				f.write(bytes(os.getcwd().lower()+"\\"+name+" -d "+dest+"\n","utf-8"))
 				print("\n[INFO] Completed")
-				# if delflag:
-					# q=input("\n[INPUT] Do want you to delete - {} : ".format(name))
-					# q=q.lower()
-					# if q=="y" or q=="yes":
 				os.remove("{}".format(os.path.join(pname,name)))
 				flag=0	
 			else:
@@ -175,18 +171,8 @@ def scattenc(name,path,kv):
 					file.write(b"\n"+bytes(emb,"utf-8")+bytes(kv,"utf-8")+key+bytes(emb,"utf-8")+encoded_text+b"\n")
 					f=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache"),"ab")
 					f.write(bytes(os.getcwd().lower()+"\\"+name+" -d "+dest+"\n","utf-8"))
-					# if rflag==0:
 					print("\n[INFO] Completed")
-					# if delflg:
-						# if rflag==1:
-						# 	os.remove("{}".format(os.path.join(pname,name)))
-						# else:
 					os.remove("{}".format(os.path.join(pname,name)))
-					# else:
-					# 	q=input("\n[INPUT] Do want you to delete - {} : ".format(name))
-					# 	q=q.lower()
-					# 	if q=="y" or q=="yes":
-					# 		os.remove("{}".format(os.path.join(pname,name)))
 				elif flag==0:
 					print("\n[INFO] {} already exist!!!".format(name))
 	else:
@@ -209,47 +195,6 @@ def retrenc(name,path,kv):
 	if kv!="":
 		kv = hashlib.sha256(kv.encode()) 
 		kv=kv.hexdigest() 
-	# des=""
-	# if path=="":
-	# 	flag=0
-	# 	fflag=0
-	# 	fil=[]
-	# 	f=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache"),"rb")
-	# 	for i in f.readlines():
-	# 		if name.lower() in i.decode().strip("\n").split("-d")[0].strip().lower():
-	# 			fil.append(i.decode().strip("\n"))
-	# 	fil=set(fil)
-	# 	if len(fil)>1:
-	# 		fdic={}
-	# 		for l,i in enumerate(fil):
-	# 			if name in i.split("-d")[0].strip():
-	# 				if "-d" in i:
-	# 					print(l+1,"-",i.split("-d")[1].strip())
-	# 					fdic[l+1]=i.split("-d")[1].strip()
-			# qq=input("\n[INPUT] Choose destination -: ")
-			# if qq!="":
-			# 	nname=fdic[int(qq)].lower().strip()
-			# 	for i in fil:
-			# 		if nname in i.split("-d")[1].strip():
-			# 			des=i.split("-d")[1].strip()
-			# 			path=des
-			# 			break
-			# else:
-			# des=default		
-	# 	elif len(fil)==1:
-	# 		for i in fil:
-	# 			des=i.split("-d")[1].strip()
-	# 	# if path=="":
-	# 	# 	path=input("\n[INPUT] Enter destination -: ")
-	# 	if ":" not in path:
-	# 		des=os.path.join(os.getcwd(),path)
-	# 	else:
-	# 		des=path
-	# else:
-	# 	des=""
-	# 	if ":" not in path:
-	# 		des=os.path.join(os.getcwd(),path)
-	# 	else:
 
 	des=path.rstrip().strip(" ")
 	if "\\" in name:
@@ -331,22 +276,23 @@ def retrenc(name,path,kv):
 			for k in f:
 				file=open(k,"rb")
 				for l,i in enumerate(file.readlines()):
-					try:
-						if bytes(emb,"utf-8") in i:
-							if str(kv)!="":
-								key=str(i).split(emb)[1].split(str(kv))[1].encode()
-							else:
-								key=str(i).split(emb)[1].encode()
-							cipher_suite = Fernet(key)
-							decoded_text = cipher_suite.decrypt(str(i).split(emb)[2][:len(str(i).split(emb)[2])-3].encode())
-							
-							if bytes(name+start,"utf-8") in decoded_text:
-								s=l
-							elif bytes(name+end,"utf-8") in decoded_text:
-								e=l
+					# try:
+					if bytes(emb,"utf-8") in i:
+						if str(kv)!="":
+							key=str(i).split(emb)[1].split(str(kv))[1].encode()
+						else:
+							key=str(i).split(emb)[1].encode()
+						cipher_suite = Fernet(key)
+						decoded_text = cipher_suite.decrypt(str(i).split(emb)[2][:len(str(i).split(emb)[2])-3].encode())
 
-					except:
-						s=-1
+						
+						if bytes(name+start,"utf-8") in decoded_text:
+							s=l
+						elif bytes(name+end,"utf-8") in decoded_text:
+							e=l
+
+					# except:
+					# 	s=-1
 				if s!=-1:
 					data=[]
 					try:
@@ -364,6 +310,7 @@ def retrenc(name,path,kv):
 						data.append(e)
 						data.append(fnt)
 						data.append(fl)
+
 						fragn[fn]=data
 					except:
 						pass
@@ -371,6 +318,7 @@ def retrenc(name,path,kv):
 					print("\n[INFO] File doesn't exist!!!")
 					return(0)
 			flag=1
+
 			if len(fragn)>0:
 				tmp=0
 				for i in fragn:
@@ -414,13 +362,6 @@ def retrenc(name,path,kv):
 				file1.close()
 	if flag==1:
 		print("\n[INFO] Completed")
-		# q=input("\n[INPUT] Do want you to open - {} : ".format(name))
-		# q=q.lower()
-		# if q=="y" or q=="yes":
-		# 	try:
-		# 		sp.Popen('{}'.format(name),shell=True)
-		# 	except:
-		# 		print("\n[ERROR] Unable to open")
 	elif flag==0 and msflag==0:
 		print("\n[INFO] File doesn't exist!!!")
 
@@ -447,15 +388,6 @@ def cleanenc(name,path,kv):
 					if "-d" in i:
 						print(l+1,"-",i.split("-d")[1].strip())
 						fdic[l+1]=i.split("-d")[1].strip()	
-			# qq=input("\n[INFO] Choose destination -: ")
-			# if qq!="":
-			# 	ename=fdic[int(qq)].lower().strip()
-			# 	for i in fil:
-			# 		if ename in i.split("-d")[1].strip():
-			# 			nname=i
-			# 			des=i.split("-d")[1].strip()
-			# 			break
-			# else:
 			des=default
 			for i in fil:
 				if name in i.split("-d")[0].strip():

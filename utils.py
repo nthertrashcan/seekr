@@ -109,7 +109,7 @@ async def existconf(websocket,fname):
 	pflag=0
 	value,file,path=scatter_existence(fname)
 	if value:
-		sctr.retrenc(file,path,"gka")
+		sctr.retrenc(file,path,"gk")
 	print(dest,fname)
 
 	if os.path.isfile(os.path.join(dest,fname)):
@@ -131,10 +131,7 @@ async def existconf(websocket,fname):
 
 async def receive(websocket,fname,pflag,file,path):
 	f=open(os.path.join(dest,fname),"ab")
-	# if pflag==1:
-	# 	f=open(os.path.join(dest,fname),"wb")
-	# elif pflag==2:
-	# 	f=open(os.path.join(dest,fname),"ab")
+	
 	flag=True
 	while True:
 		await websocket.send("--uploading")
@@ -152,18 +149,14 @@ async def receive(websocket,fname,pflag,file,path):
 		
 		await websocket.send("--uploaded")
 		f.close()
+		path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/fragments")
 		if file is None:
-			path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/fragments")
-			sctr.scattenc(os.path.join(dest,fname),path,"gka")
+			sctr.scattenc(os.path.join(dest,fname),path,"gk")
 		else:
-			sctr.scattenc(file,path,"gka")
+			sctr.scattenc(file,path,"gk")
 
 	else:
 		print("stopped uploading!!!")
-
-		# f.close()
-		
-	
 
 
 
