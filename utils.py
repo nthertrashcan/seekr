@@ -22,20 +22,20 @@ async def getconf(websocket,ret,filename):
 		await websocket.send(f"--nbytes{s}")
 		await websocket.send(filename)
 		ccon=await websocket.recv()
-		print("confirmation:",ccon)
+		# print("Confirmation:",ccon)
 		if ccon=="--111":
 			pflag=1
 		elif ccon=="--222":
 			pflag=2
 			left=await websocket.recv()
 		elif ccon=="--000":
-			print("Already Exist!!!")
+			print("\n[INFO] File Already Exist!!!")
 		else:
 			await websocket.send("--*")
 	return (pflag,left)
 
 async def send(websocket,ret):
-	print("Sending...")
+	print("\n[INFO] Sending...")
 	if(ret!=""):
 		file=open(ret,'rb')
 		mx=len(file.readlines())
@@ -59,14 +59,14 @@ async def send(websocket,ret):
 			file=open(ret,'rb')
 			await websocket.send(bytes(b"".join(file.readlines()[nn:mx])))
 			await websocket.send("--received")
-			print("finished!!!")
+			print("\n[INFO] File Sent")
 			file.close()
 		else:
-			print("Sending Stopped!!!")
+			print("\n[INFO] Stopped!!!")
 	
 
 async def resume_send(websocket,ret,left=0):
-	print("Resuming...")
+	print("\n[INFO] Resuming...")
 	if ret!="":
 		file=open(ret,"rb")
 		mx=len(file.read())
@@ -97,10 +97,10 @@ async def resume_send(websocket,ret,left=0):
 			file=open(ret,'rb')
 			await websocket.send(bytes(file.read()[nn:mx]))
 			await websocket.send("--received")
-			print("finished!!!")
+			print("\n[INFO] File sent")
 			file.close()
 		else:
-			print("Resuming Stopped!!!")
+			print("\n[INFO] Stopped!!!")
 		
 
 
@@ -118,11 +118,11 @@ async def existconf(websocket,fname):
 		size=int(size)
 		if size>s:
 			await websocket.send(f"--upnbytes{s}")
-			print("Resuming...")
+			print("\n[INFO] Resuming...")
 			pflag=2
 	else:
 		await websocket.send(f"--upnbytes{0}")
-		print("Receiving...")
+		print("\n[INFO] Receiving...")
 		pflag=1
 
 
@@ -145,18 +145,20 @@ async def receive(websocket,fname,pflag,file,path):
 		else:
 			f.write(data)
 	if flag:
-		print("finished uploading!!!")
+		print("\n[INFO] Received")
 		
 		await websocket.send("--uploaded")
 		f.close()
-		path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/fragments")
-		if file is None:
-			sctr.scattenc(os.path.join(dest,fname),path,"gk")
-		else:
-			sctr.scattenc(file,path,"gk")
+		sf=open("sctrflag.txt","r")
+		if sf.read()=="1":
+			path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/fragments")
+			if file is None:
+				sctr.scattenc(os.path.join(dest,fname),path,"gk")
+			else:
+				sctr.scattenc(file,path,"gk")
 
 	else:
-		print("stopped uploading!!!")
+		print("\n[INFO] Stopped!!!")
 
 
 
@@ -223,17 +225,19 @@ def move(file):
 
 
 def scatter_existence(filename):
-	if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache")):
-		files={}
-		f=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache"),"r",encoding="utf-8")
-		for i in f.readlines():
-			u,v=i.split("-d")
-			files[u]=v
+	sf=open("sctrflag.txt","r")
 
-		
-		for file in files:
-			if finder.checkMatch(finder.omit(filename).lower(),finder.omit(file).lower()):
-				return (True,file,files[file])
+	if sf.read()=="1":
+		if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache")):
+			files={}
+			f=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache"),"r",encoding="utf-8")
+			for i in f.readlines():
+				u,v=i.split("-d")
+				files[u]=v
+
+			for file in files:
+				if finder.checkMatch(finder.omit(filename).lower(),finder.omit(file).lower()):
+					return (True,file,files[file])
 	
 	return (False,None,None)
 

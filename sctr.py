@@ -81,7 +81,7 @@ def scattenc(name,path,kv):
 			for i in range(0,10):
 				fl=open(f"{dest}/{i}","wb")
 
-			print("\n[INFO] Empty folder!!!, Creating dumming files...")
+			print("\n[INFO] Empty folder!!!, Creating dummy files...")
 			for r,d,fi in os.walk(dest):
 				for i in fi:
 					f.append(os.path.join(r,i))

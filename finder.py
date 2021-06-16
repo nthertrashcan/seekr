@@ -126,7 +126,6 @@ def search(arg,path=None,ext=None):
 							out=os.path.join(root,directory)
 
 							zipf = zipfile.ZipFile(f'{os.path.join(root,directory)}.zip', 'w', zipfile.ZIP_DEFLATED)
-							print(out)
 							zipdir(out,zipf)
 							zipf.close()
 							return f"{os.path.join(root,directory)}.zip",f"{directory}.zip"
@@ -137,7 +136,7 @@ def lof(arg):
 
 
 	direc=direcfile.readlines()
-	print(direc)
+	print("\n[DIRECTORIES]",direc)
 
 	global extn
 	flag=True
@@ -178,13 +177,13 @@ def lof(arg):
 							sen.append(directory)
 							print("d",directory)
 			
-	print("Sending list...")
+	print("\n[INFO] Sending list...")
 	print(lofiles)
 	return lofiles
 	
 
 def tozip(directory):
-	print("Zippin...")
+	print("\n[INFO] Zippin...")
 	zipf = zipfile.ZipFile(f'{directory}.zip', 'w', zipfile.ZIP_DEFLATED)
 	zipdir(directory,zipf)
 	zipf.close()
@@ -327,7 +326,7 @@ def pool(arg):
 							sen.append(directory)
 							print("d",directory)
 			
-	print("Sending list...")
+	print("\n[INFO] Sending list...")
 	return lofiles
 
 
