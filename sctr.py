@@ -102,6 +102,7 @@ def scattenc(name,path,kv):
 						decoded_text = cipher_suite.decrypt(str(i).split(emb)[2][:len(str(i).split(emb)[2])-3].encode())
 						if bytes(name+start,"utf-8") in decoded_text:
 							flag=0
+							print(name+start)
 							print("\n[INFO] {} already exist!!!".format(name))
 							break
 				if flag==1:
@@ -197,13 +198,14 @@ def retrenc(name,path,kv):
 		kv=kv.hexdigest() 
 
 	des=path.rstrip().strip(" ")
-	if "\\" in name:
-		name=name.split("\\")[len(name.split("\\"))-1].strip()
-	elif "/" in name:
-		name=name.split("/")[len(name.split("/"))-1].strip()
-
-
+	# if "\\" in name:
+	name=name.split("\\")[len(name.split("\\"))-1].strip()
+	# elif "/" in name:
+		# name=name.split("/")[len(name.split("/"))-1].strip()
 	print(name,des)
+	# exit(0)
+
+
 	exflag=0
 	ext=""
 	for i in extt:
@@ -225,12 +227,14 @@ def retrenc(name,path,kv):
 		for l,i in enumerate(file.readlines()):
 			if bytes(emb,"utf-8") in i:
 				try:
+
 					if str(kv)!="":
 						key=str(i).split(emb)[1].split(str(kv))[1].encode()
 					else:
 						key=str(i).split(emb)[1].encode()
 					cipher_suite = Fernet(key)
 					decoded_text = cipher_suite.decrypt(str(i).split(emb)[2][:len(str(i).split(emb)[2])-3].encode())
+
 					if bytes(name+start,"utf-8") in decoded_text:
 						s=l
 					elif bytes(name+end,"utf-8") in decoded_text:
@@ -276,23 +280,24 @@ def retrenc(name,path,kv):
 			for k in f:
 				file=open(k,"rb")
 				for l,i in enumerate(file.readlines()):
-					# try:
-					if bytes(emb,"utf-8") in i:
-						if str(kv)!="":
-							key=str(i).split(emb)[1].split(str(kv))[1].encode()
-						else:
-							key=str(i).split(emb)[1].encode()
-						cipher_suite = Fernet(key)
-						decoded_text = cipher_suite.decrypt(str(i).split(emb)[2][:len(str(i).split(emb)[2])-3].encode())
+					try:
+						# print(i)
+						if bytes(emb,"utf-8") in i:
+							if str(kv)!="":
+								key=str(i).split(emb)[1].split(str(kv))[1].encode()
+							else:
+								key=str(i).split(emb)[1].encode()
+							cipher_suite = Fernet(key)
+							decoded_text = cipher_suite.decrypt(str(i).split(emb)[2][:len(str(i).split(emb)[2])-3].encode())
 
-						
-						if bytes(name+start,"utf-8") in decoded_text:
-							s=l
-						elif bytes(name+end,"utf-8") in decoded_text:
-							e=l
+							
+							if bytes(name+start,"utf-8") in decoded_text:
+								s=l
+							elif bytes(name+end,"utf-8") in decoded_text:
+								e=l
 
-					# except:
-					# 	s=-1
+					except:
+						pass
 				if s!=-1:
 					data=[]
 					try:

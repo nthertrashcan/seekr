@@ -225,15 +225,14 @@ def move(file):
 def scatter_existence(filename):
 	if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache")):
 		files={}
-		f=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache"),"r")
-
+		f=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache"),"r",encoding="utf-8")
 		for i in f.readlines():
 			u,v=i.split("-d")
 			files[u]=v
 
 		
 		for file in files:
-			if finder.checkMatch(filename,file):
+			if finder.checkMatch(finder.omit(filename).lower(),finder.omit(file).lower()):
 				return (True,file,files[file])
 	
 	return (False,None,None)

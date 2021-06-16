@@ -42,7 +42,7 @@ async def resp(websocket,path):
                     continue
                 else:
                     print(f"Recieved: {message}")
-                if "--0" in message:
+                if "--0" in message[:3]:
                     zipflag=False
                     fname=""
         
@@ -51,9 +51,9 @@ async def resp(websocket,path):
                     if value:
 
                         sctr.retrenc(file,path,"gk")
-                        fname=file.split("/")[len(file.split("/"))-1].strip()
-                        ret=os.path.join(os.path.dirname(os.path.realpath(__file__)),f"{fname}")
-
+                        ret=os.path.join(os.path.dirname(os.path.realpath(__file__)),f"{file}")
+                        fname=ret.split("\\")[len(ret.split("\\"))-1].strip()
+                     
                     if "--r" in message:
                         message=message.split("--r")[1].strip()
                         ret=message.split("--d")[1].strip()
@@ -89,6 +89,7 @@ async def resp(websocket,path):
                     left=""
                     if(ret!=""):
                         await websocket.send("--ifp{}".format(ret))
+                        print(fname)
                         pflag,left=await utils.getconf(websocket,ret,fname)
                         if pflag==1:
                             await utils.send(websocket,ret)
@@ -100,7 +101,7 @@ async def resp(websocket,path):
 
                     if value:
                         os.remove(fname)
-                elif "--1" in message:
+                elif "--1" in message[:3]:
                     fname=message.split("--1")[1]
                     if fname!='':
                         pflag,file,path=await utils.existconf(websocket,fname)
@@ -111,7 +112,7 @@ async def resp(websocket,path):
                         else:
                             await websocket.send(f"--upnbytes{-2}")
                             print("File Already Exist!!!")
-                elif "--2" in message.lower().strip():
+                elif "--2" in message[:3].lower().strip():
                     ret,fname,path,downflag=utils.download_preprocess(message)
                     left=""
                     if(ret!=""):
