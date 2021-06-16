@@ -7,10 +7,10 @@ import os
 import shutil
 import sctr
 
-if os.path.isfile("destination.txt"):
-	dest=open("destination.txt").readlines()
-else:
-	dest=os.path.join(os.path.dirname(os.path.realpath(__file__)),"recieved")
+# if os.path.isfile("destination.txt"):
+# 	dest=open("destination.txt").read()
+# else:
+dest=os.path.join(os.path.dirname(os.path.realpath(__file__)),"received")
 
 
 
@@ -107,6 +107,11 @@ async def resume_send(websocket,ret,left=0):
 
 async def existconf(websocket,fname):
 	pflag=0
+	value,file,path=scatter_existence(fname)
+	if value:
+		sctr.retrenc(file,path,"gka")
+	print(dest,fname)
+
 	if os.path.isfile(os.path.join(dest,fname)):
 		s=os.stat(os.path.join(dest,fname)).st_size
 		size=await websocket.recv()	
@@ -120,31 +125,41 @@ async def existconf(websocket,fname):
 		print("Receiving...")
 		pflag=1
 
-	return pflag
+
+	return (pflag,file,path)
 
 
-async def receive(websocket,fname,pflag):
-	with open(os.path.join(dest,fname),"ab") as f:
+async def receive(websocket,fname,pflag,file,path):
+	f=open(os.path.join(dest,fname),"ab")
 	# if pflag==1:
 	# 	f=open(os.path.join(dest,fname),"wb")
 	# elif pflag==2:
-		flag=True
-		while True:
-			await websocket.send("--uploading")
-			data=await websocket.recv()
-			if type(data)==str:
-				if data=="--X":
-					break
-				if data=="--C":
-					flag=False
-					break
-			else:
-				f.write(data)
-		if flag:
-			print("finished uploading!!!")
-			await websocket.send("--uploaded")
+	# 	f=open(os.path.join(dest,fname),"ab")
+	flag=True
+	while True:
+		await websocket.send("--uploading")
+		data=await websocket.recv()
+		if type(data)==str:
+			if data=="--X":
+				break
+			if data=="--C":
+				flag=False
+				break
 		else:
-			print("stopped uploading!!!")
+			f.write(data)
+	if flag:
+		print("finished uploading!!!")
+		
+		await websocket.send("--uploaded")
+		f.close()
+		if file is None:
+			path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/fragments")
+			sctr.scattenc(os.path.join(dest,fname),path,"gka")
+		else:
+			sctr.scattenc(file,path,"gka")
+
+	else:
+		print("stopped uploading!!!")
 
 		# f.close()
 		
@@ -210,6 +225,25 @@ def download_preprocess(message):
 
 def move(file):
     shutil.move(os.path.join(os.path.dirname(os.path.realpath(__file__)),"downloaded/temp/{}".format(file)),os.path.join(os.path.dirname(os.path.realpath(__file__)),"downloaded/{}".format(file)))
+
+
+
+
+def scatter_existence(filename):
+	if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache")):
+		files={}
+		f=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache"),"r")
+
+		for i in f.readlines():
+			u,v=i.split("-d")
+			files[u]=v
+
+		
+		for file in files:
+			if finder.checkMatch(filename,file):
+				return (True,file,files[file])
+	
+	return (False,None,None)
 
 
 
