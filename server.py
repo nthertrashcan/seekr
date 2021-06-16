@@ -4,6 +4,7 @@ import os
 import finder
 import random
 import utils
+import sctr
 
 ret=""
 
@@ -44,12 +45,24 @@ async def resp(websocket,path):
                 if "--0" in message:
                     zipflag=False
                     fname=""
+        
                     message=message.split("--0")[1]
+                    value,file,path=utils.scatter_existence(message)
+                    if value:
+                        sctr.retrenc(file,path,"gka")
+                        fname=file.split("/")[len(file.split("/"))-1].strip()
+                        ret=os.path.join(os.path.dirname(os.path.realpath(__file__)),f"{fname}")
+                        print(fname,ret)
+
                     if "--r" in message:
                         message=message.split("--r")[1].strip()
                         ret=message.split("--d")[1].strip()
                         fname=message.split("--d")[0].strip()
-                    
+
+
+
+                        
+
                     if fname!="":
                         pass
                         
@@ -59,20 +72,20 @@ async def resp(websocket,path):
                         await websocket.send(files)
                         fname=await websocket.recv()
                         try:
-                        	if "--0" not in fname and "--1" not in fname and "--2" not in fname:
-                        		ret=lofiles[fname]
-                        		ret=finder.check(ret)
-                        		if ret.endswith(".zip"):
-                        			zipflag=True
-                        			if not fname.endswith(".zip"):
-                        				fname+=".zip"
-                        	else:
-                        		await websocket.send("--*")
-                        		continue
+                            if "--0" not in fname and "--1" not in fname and "--2" not in fname:
+                                ret=lofiles[fname]
+                                ret=finder.check(ret)
+                                if ret.endswith(".zip"):
+                                    zipflag=True
+                                    if not fname.endswith(".zip"):
+                                        fname+=".zip"
+                            else:
+                                await websocket.send("--*")
+                                continue
                         except:
-                        	print("Sending Cancelled")
-                        	ret=""
-                        	zipflag=False
+                            print("Sending Cancelled")
+                            ret=""
+                            zipflag=False
                     left=""
                     if(ret!=""):
                         await websocket.send("--ifp{}".format(ret))
@@ -84,12 +97,17 @@ async def resp(websocket,path):
 
                     if zipflag:
                         os.remove(ret)
+
+                    if value:
+                        os.remove(fname)
                 elif "--1" in message:
                     fname=message.split("--1")[1]
                     if fname!='':
-                        pflag=await utils.existconf(websocket,fname)
+                        pflag,file,path=await utils.existconf(websocket,fname)
                         if pflag!=0:
-                            await utils.receive(websocket,fname,pflag)
+                            if file is not None:
+                                sctr.cleanenc(file,path,"gka")
+                            await utils.receive(websocket,fname,pflag,file,path)
                         else:
                             await websocket.send(f"--upnbytes{-2}")
                             print("File Already Exist!!!")
