@@ -180,8 +180,9 @@ def ydl(arg,mp3flag=0,flag=1):
     
     ch=""
     link={}
-    url="https://www.youtube.com/results?search_query="+arg.strip(".mp3")
-    ydl_opts = {'outtmpl': '{}.%(ext)s'.format(os.path.join(os.path.dirname(os.path.realpath(__file__)),os.path.join("downloaded/temp",arg.strip(".mp3"))))}
+    url="https://www.youtube.com/results?search_query="+arg.replace(".mp3","")
+    ydl_opts = {'outtmpl': '{}.%(ext)s'.format(os.path.join(os.path.dirname(os.path.realpath(__file__)),os.path.join("downloaded/temp",arg.replace(".mp3",""))))}
+
     
     def dwl_vid(url): 
         with youtube_dl.YoutubeDL(ydl_opts) as ydl: 

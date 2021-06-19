@@ -45,12 +45,11 @@ async def resp(websocket,path):
                 if "--0" in message[:3]:
                     zipflag=False
                     fname=""
-        
-                    message=message.split("--0")[1]
+                    message=message[3:]
 
                     value,file,path=utils.scatter_existence(message)
                     if value:
-                        sctr.retrenc(file,path,"gk")
+                        sctr.retrenc(file,path,"")
                         ret=os.path.join(os.path.dirname(os.path.realpath(__file__)),f"{file}")
                         fname=ret.split("\\")[len(ret.split("\\"))-1].strip()
                      
@@ -97,17 +96,18 @@ async def resp(websocket,path):
                     if value:
                         os.remove(fname)
                 elif "--1" in message[:3]:
-                    fname=message.split("--1")[1]
+                    fname=message[3:]
                     if fname!='':
                         pflag,file,path=await utils.existconf(websocket,fname)
                         if pflag!=0:
                             if file is not None:
-                                sctr.cleanenc(file,path,"gk")
+                                sctr.cleanenc(file,path,"")
                             await utils.receive(websocket,fname,pflag,file,path)
                         else:
                             await websocket.send(f"--upnbytes{-2}")
                             print("\n[INFO] File Already Exist!!!")
-                elif "--2" in message[:3].lower().strip():
+                elif "--2" in message[:3]:
+
                     ret,fname,path,downflag=utils.download_preprocess(message)
                     left=""
                     if(ret!=""):

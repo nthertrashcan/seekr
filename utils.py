@@ -7,11 +7,12 @@ import os
 import shutil
 import sctr
 
-# if os.path.isfile("destination.txt"):
-# 	dest=open("destination.txt").read()
-# else:
-dest=os.path.join(os.path.dirname(os.path.realpath(__file__)),"received")
 
+if not os.path.isdir(os.path.join(os.path.dirname(os.path.realpath(__file__)),"utilfiles")):
+	os.mkdir(os.path.join(os.path.dirname(os.path.realpath(__file__)),"utilfiles"))
+
+
+dest=os.path.join(os.path.dirname(os.path.realpath(__file__)),"received")
 
 
 async def getconf(websocket,ret,filename):
@@ -109,7 +110,7 @@ async def existconf(websocket,fname):
 	pflag=0
 	value,file,path=scatter_existence(fname)
 	if value:
-		sctr.retrenc(file,path,"gk")
+		sctr.retrenc(file,path,"")
 	print(dest,fname)
 
 	if os.path.isfile(os.path.join(dest,fname)):
@@ -149,13 +150,14 @@ async def receive(websocket,fname,pflag,file,path):
 		
 		await websocket.send("--uploaded")
 		f.close()
-		sf=open("sctrflag.txt","r")
-		if sf.read()=="1":
-			path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/fragments")
-			if file is None:
-				sctr.scattenc(os.path.join(dest,fname),path,"gk")
-			else:
-				sctr.scattenc(file,path,"gk")
+		if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"utilfiles/sctrflag.txt")):
+			sf=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"utilfiles/sctrflag.txt"),"r")			
+			if sf.read()=="1":
+				path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/fragments")
+				if file is None:
+					sctr.scattenc(os.path.join(dest,fname),path,"")
+				else:
+					sctr.scattenc(file,path,"")
 
 	else:
 		print("\n[INFO] Stopped!!!")
@@ -168,11 +170,12 @@ def download_preprocess(message):
 	path="downloaded"
 	downflag=False
 
-	temp=message.lower().split("--2")[1]
+	temp=message[3:].lower()
+	
 	if temp.endswith("pdf"):
-		ret=temp.strip("pdf").strip(".").strip()+".pdf"
+		ret=temp.replace("pdf","").strip(".").strip()+".pdf"
 	elif temp.endswith("mp3"):
-		ret=temp.strip("mp3").strip(".").strip()+".mp3"
+		ret=temp.replace("mp3","").strip(".").strip()+".mp3"
 	else:
 		ret=temp.strip()
 
@@ -222,10 +225,14 @@ def move(file):
     shutil.move(os.path.join(os.path.dirname(os.path.realpath(__file__)),"downloaded/temp/{}".format(file)),os.path.join(os.path.dirname(os.path.realpath(__file__)),"downloaded/{}".format(file)))
 
 
-
-
 def scatter_existence(filename):
-	sf=open("sctrflag.txt","r")
+	if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"utilfiles/sctrflag.txt")):
+		sf=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"utilfiles/sctrflag.txt"),"r")
+	else:
+		sf=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"utilfiles/sctrflag.txt"),"w")
+		sf.write("0")
+		return (False,None,None)
+
 
 	if sf.read()=="1":
 		if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"Scatter/cache")):
