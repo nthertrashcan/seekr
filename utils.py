@@ -111,7 +111,7 @@ async def existconf(websocket,fname):
 	value,file,path=scatter_existence(fname)
 	if value:
 		sctr.retrenc(file,path,"")
-	print(dest,fname)
+	print("\n[DESTINATION]",os.path.join(dest,fname))
 
 	if os.path.isfile(os.path.join(dest,fname)):
 		s=os.stat(os.path.join(dest,fname)).st_size
@@ -149,7 +149,7 @@ async def receive(websocket,fname,pflag,file,path):
 		print("\n[INFO] Received")
 		
 		await websocket.send("--uploaded")
-		f.close()
+		
 		if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),"utilfiles/sctrflag.txt")):
 			sf=open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"utilfiles/sctrflag.txt"),"r")			
 			if sf.read()=="1":
@@ -161,6 +161,8 @@ async def receive(websocket,fname,pflag,file,path):
 
 	else:
 		print("\n[INFO] Stopped!!!")
+
+	f.close()
 
 
 
